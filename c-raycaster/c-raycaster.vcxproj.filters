@@ -30,13 +30,10 @@
     <ClCompile Include="game\ray.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="maths\vector.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\level.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="maths\angle.c">
+    <ClCompile Include="maths\maths.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,13 +53,10 @@
     <ClInclude Include="game\ray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="maths\vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="maths\angle.h">
+    <ClInclude Include="maths\maths.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

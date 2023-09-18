@@ -132,24 +132,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="maths\angle.c" />
     <ClCompile Include="game-core.c" />
     <ClCompile Include="game-state.c" />
     <ClCompile Include="game\level.c" />
     <ClCompile Include="game\ray.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="game\raycaster.c" />
-    <ClCompile Include="maths\vector.c" />
+    <ClCompile Include="maths\maths.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="maths\angle.h" />
     <ClInclude Include="game-core.h" />
     <ClInclude Include="game-state.h" />
     <ClInclude Include="game\level.h" />
     <ClInclude Include="game\ray.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="game\raycaster.h" />
-    <ClInclude Include="maths\vector.h" />
+    <ClInclude Include="maths\maths.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
