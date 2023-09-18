@@ -40,7 +40,7 @@ void GameCore_Print(char* message) {
 
 void GameCore_GameLoop(struct GameCore* gameCore) {
 	SDL_Event e;
-	Vector mousePosition = {0,0};
+	int lookDegrees = 0;
 	
 	while (gameCore->state->isRunning) {
 		while (SDL_PollEvent(&e)) {
@@ -49,25 +49,44 @@ void GameCore_GameLoop(struct GameCore* gameCore) {
 			}
 			if (e.type == SDL_MOUSEMOTION)
 			{
-				mousePosition.x = e.motion.x;
-				mousePosition.y = e.motion.y;
+				lookDegrees += e.motion.xrel;
 			}
 		}
 
-		double mouseAngle = atan2f(
-			mousePosition.y - gameCore->level->player.y,
-			mousePosition.x - gameCore->level->player.x
-		);
-		mouseAngle -= (RAYS / 2) * DEG_TO_RAD;
+		const Uint8* keyboardState = SDL_GetKeyboardState(NULL);
 
-		Raycaster_Update(gameCore->level->raycaster, &gameCore->level->player, mouseAngle);
-		Level_Raycast(gameCore->level, gameCore->renderer);
+		if (lookDegrees > 360) {
+			lookDegrees = 0;
+		}
+		else if(lookDegrees < 0) {
+			lookDegrees = 360;
+		}
+
+		double lookAngle = lookDegrees * DEG_TO_RAD;
+
+		// TODO: Fix the movement & add collisions with walls
+		// TODO: Also - the perspective is a bit buggy still, no massive fisheye effect, but still work to be done there.
+		if (keyboardState[SDL_SCANCODE_W]) {
+			gameCore->level->player.x += cos(lookAngle) * 0.05;
+			gameCore->level->player.y += sin(lookAngle) * 0.05;
+		}
+		else if (keyboardState[SDL_SCANCODE_S]) {
+			gameCore->level->player.x -= cos(lookAngle) * 0.05;
+			gameCore->level->player.y -= sin(lookAngle) * 0.05;
+		}
+
+		Raycaster_Update(gameCore->level->raycaster, &gameCore->level->player, lookAngle);
 
 		SDL_SetRenderDrawColor(gameCore->renderer, 0, 0, 0, 255);
 		SDL_RenderClear(gameCore->renderer);
-		Level_DrawWalls(gameCore->level, gameCore->renderer);
-		Level_DrawPlayer(gameCore->level, gameCore->renderer);
+		Level_Raycast(gameCore->level, gameCore->renderer);
 		Raycaster_RenderView(gameCore->level->raycaster, gameCore->renderer);
+		
+#ifdef DEBUG
+		Level_DebugDrawPlayer(gameCore->level, gameCore->renderer);
+		Level_DebugDrawWalls(gameCore->level, gameCore->renderer);
+#endif // DEBUG
+
 		SDL_RenderPresent(gameCore->renderer);
 	}
 
