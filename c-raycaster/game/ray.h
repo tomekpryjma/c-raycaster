@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../maths/vector.h"
+#include "../maths/maths.h"
 
 typedef struct {
 	Vector position;
