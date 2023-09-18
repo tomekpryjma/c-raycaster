@@ -24,6 +24,9 @@ typedef struct {
 
 Level* Level_Alloc();
 void Level_Prepare(Level* level);
-void Level_DrawWalls(const Level* level, SDL_Renderer* renderer);
-void Level_DrawPlayer(const Level* level, SDL_Renderer* renderer);
 void Level_Raycast(const Level* level, SDL_Renderer* renderer);
+
+#ifdef DEBUG
+void Level_DebugDrawWalls(const Level* level, SDL_Renderer* renderer);
+void Level_DebugDrawPlayer(const Level* level, SDL_Renderer* renderer);
+#endif // DEBUG

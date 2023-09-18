@@ -65,18 +65,7 @@ void Level_Prepare(Level* level) {
 	}
 }
 
-void Level_DrawWalls(const Level* level, SDL_Renderer* renderer) {
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_RenderDrawRects(renderer, level->walls, level->wallCount);
-}
-
-void Level_DrawPlayer(const Level* level, SDL_Renderer* renderer) {
-	SDL_Rect rect = { level->player.x, level->player.y, 5, 5 };
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	SDL_RenderDrawRect(renderer, &rect);
-}
-
-void Level_Raycast(const Level* level, SDL_Renderer* renderer) {
+void Level_Raycast(const Level* level) {
 	for (int i = 0; i < RAYS; i++) {
 		Ray* ray = level->raycaster->rays[i];
 		Vector origin = ray->position;
@@ -85,6 +74,23 @@ void Level_Raycast(const Level* level, SDL_Renderer* renderer) {
 		int steps = abs(dx) >= abs(dy) ? abs(dx) : abs(dy);
 
 		if (steps == 0) continue;
+
+		Vector cameraPlaneIntersection;
+		float x1 = level->raycaster->cameraPlaneA.x;
+		float y1 = level->raycaster->cameraPlaneA.y;
+		float x2 = level->raycaster->cameraPlaneB.x;
+		float y2 = level->raycaster->cameraPlaneB.y;
+		float x3 = origin.x;
+		float y3 = origin.y;
+		float x4 = origin.x + ray->direction.x * RAY_LENGTH;
+		float y4 = origin.y + ray->direction.y * RAY_LENGTH;
+		float denominator = ((x1 - x2) * (y3 - y4)) - ((y1 - y2) * (x3 - x4));
+
+		if (denominator == 0) continue;
+
+		float t = (((x1 - x3) * (y3 - y4)) - ((y1 - y3) * (x3 - x4))) / denominator;
+		cameraPlaneIntersection.x = x1 + t * (x2 - x1);
+		cameraPlaneIntersection.y = y1 + t * (y2 - y1);
 
 		dx /= steps;
 		dy /= steps;
@@ -103,10 +109,35 @@ void Level_Raycast(const Level* level, SDL_Renderer* renderer) {
 			col = floor(x) / CELL_SIZE;
 
 			if (LEVEL_MAP[row][col] == 1) {
-				Vector boxHit = {x, y};
-				level->raycaster->hits[i] = boxHit;
 				hit = true;
 			}
 		}
+
+		Vector boxHit = { x, y };
+		float distance = Vector_Magnitude(boxHit.x - cameraPlaneIntersection.x, boxHit.y - cameraPlaneIntersection.y);
+		float perpendicularDistance = distance * ray->direction.y;
+		level->raycaster->distances[i] = perpendicularDistance;
 	}
 }
+
+#ifdef DEBUG
+void Level_DebugShowCameraPlaneIntesections(const Vector* cameraPlaneIntersection, SDL_Renderer* renderer) {
+	SDL_Rect rect = { cameraPlaneIntersection->x, cameraPlaneIntersection->y, 2, 2 };
+	SDL_SetRenderDrawColor(renderer, 255, 255, 153, 255);
+	SDL_RenderDrawRect(renderer, &rect);
+}
+void Level_DebugDrawRay(float x, float y, SDL_Renderer* renderer) {
+	SDL_Rect rect = {x, y, 2, 2};
+	SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+	SDL_RenderDrawRect(renderer, &rect);
+}
+void Level_DebugDrawPlayer(const Level* level, SDL_Renderer* renderer) {
+	SDL_Rect rect = { level->player.x, level->player.y, 5, 5 };
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+	SDL_RenderDrawRect(renderer, &rect);
+}
+void Level_DebugDrawWalls(const Level* level, SDL_Renderer* renderer) {
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderDrawRects(renderer, level->walls, level->wallCount);
+}
+#endif // DEBUG
